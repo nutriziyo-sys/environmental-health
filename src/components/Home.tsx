@@ -49,9 +49,16 @@ export default function Home() {
               alt="Hero" 
               referrerPolicy="no-referrer"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent"></div>
           </div>
         )}
+        
+        {/* Gradient Overlay */}
+        <div 
+          className="absolute inset-0 z-[1]"
+          style={{ 
+            background: `linear-gradient(to right, ${settings?.hero_gradient_start || settings?.hero_bg_color || '#0f172a'}, ${settings?.hero_gradient_end || 'transparent'})`
+          }}
+        ></div>
         
         <div className="max-w-7xl mx-auto px-6 w-full relative z-10">
           {/* Title Corner */}
@@ -61,9 +68,14 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="max-w-5xl"
           >
-            <span className="inline-block px-4 py-1.5 bg-primary/20 text-primary-foreground text-xs font-bold uppercase tracking-widest rounded-full mb-8 backdrop-blur-md border border-white/10">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="inline-block px-6 py-2 bg-[#1e3a8a] text-white text-sm font-bold uppercase tracking-widest rounded-lg mb-8 shadow-xl border border-white/10"
+            >
               Advancing Environmental Health
-            </span>
+            </motion.div>
             <h1 className="text-6xl md:text-8xl lg:text-9xl font-serif font-bold text-white mb-10 leading-[0.85] tracking-tighter">
               {settings?.hero_title ? (
                 <>

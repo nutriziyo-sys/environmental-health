@@ -41,6 +41,8 @@ export interface Professor {
   hero_title?: string;
   hero_subtitle?: string;
   hero_bg_color?: string;
+  hero_gradient_start?: string;
+  hero_gradient_end?: string;
   secondary_bg_color?: string;
   address?: string;
   phone?: string;

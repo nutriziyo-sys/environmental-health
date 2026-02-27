@@ -173,7 +173,8 @@ export default function AdminPage() {
         
         <nav className="flex-grow px-4 space-y-2">
           {menuItems.map(item => (
-            <button
+            <motion.button
+              whileTap={{ scale: 0.95 }}
               key={item.id}
               onClick={() => {
                 setActiveTab(item.id as Tab);
@@ -186,18 +187,19 @@ export default function AdminPage() {
             >
               <item.icon size={18} />
               {item.label}
-            </button>
+            </motion.button>
           ))}
         </nav>
 
         <div className="p-4 border-t border-slate-800">
-          <button 
+          <motion.button 
+            whileTap={{ scale: 0.95 }}
             onClick={() => setIsAuthenticated(false)}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-400 hover:bg-red-500/10 transition-all"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-400 hover:bg-red-500/10 transition-all active:bg-red-500/20"
           >
             <LogOut size={18} />
             Logout
-          </button>
+          </motion.button>
         </div>
       </div>
 
@@ -210,15 +212,16 @@ export default function AdminPage() {
               <p className="text-slate-500">Manage your website content and information.</p>
             </div>
             {activeTab !== 'dashboard' && activeTab !== 'messages' && activeTab !== 'professor' && (
-              <button 
-                onClick={() => {
-                  setEditingItem(null);
-                  setShowAddModal(true);
-                }}
-                className="px-6 py-3 bg-primary text-white rounded-full font-bold flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
-              >
-                <Plus size={18} /> Add New
-              </button>
+            <motion.button 
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                setEditingItem(null);
+                setShowAddModal(true);
+              }}
+              className="px-6 py-3 bg-primary text-white rounded-full font-bold flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-105 transition-transform active:scale-95"
+            >
+              <Plus size={18} /> Add New
+            </motion.button>
             )}
           </header>
 
@@ -327,11 +330,21 @@ export default function AdminPage() {
                   </div>
                 )}
                 <div className="flex gap-4">
-                  <button type="submit" className="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all">Save Item</button>
-                  <button type="button" onClick={() => {
-                    setShowAddModal(false);
-                    setEditingItem(null);
-                  }} className="px-8 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all">Cancel</button>
+                  <motion.button 
+                    whileTap={{ scale: 0.95 }}
+                    type="submit" className="px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all active:bg-primary/80 shadow-lg shadow-primary/20"
+                  >
+                    Save Item
+                  </motion.button>
+                  <motion.button 
+                    whileTap={{ scale: 0.95 }}
+                    type="button" onClick={() => {
+                      setShowAddModal(false);
+                      setEditingItem(null);
+                    }} className="px-8 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all active:bg-slate-300"
+                  >
+                    Cancel
+                  </motion.button>
                 </div>
               </form>
             </motion.div>
@@ -374,23 +387,25 @@ export default function AdminPage() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <button 
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
                           onClick={() => {
                             setEditingItem(item);
                             setShowAddModal(true);
                           }}
                           title="Edit Item"
-                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all"
+                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all active:bg-primary/10"
                         >
                           <Edit2 size={20} />
-                        </button>
-                        <button 
+                        </motion.button>
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
                           onClick={() => handleDelete('news', item.id)} 
                           title="Delete Item"
-                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all"
+                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all active:bg-red-100"
                         >
                           <Trash2 size={20} />
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
                   ))}
@@ -409,23 +424,25 @@ export default function AdminPage() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <button 
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
                           onClick={() => {
                             setEditingItem(item);
                             setShowAddModal(true);
                           }}
                           title="Edit Item"
-                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all"
+                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all active:bg-primary/10"
                         >
                           <Edit2 size={20} />
-                        </button>
-                        <button 
+                        </motion.button>
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
                           onClick={() => handleDelete('research', item.id)} 
                           title="Delete Item"
-                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all"
+                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all active:bg-red-100"
                         >
                           <Trash2 size={20} />
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
                   ))}
@@ -441,23 +458,25 @@ export default function AdminPage() {
                         <div className="text-sm text-slate-500">{item.journal} ({item.year})</div>
                       </div>
                       <div className="flex gap-2">
-                        <button 
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
                           onClick={() => {
                             setEditingItem(item);
                             setShowAddModal(true);
                           }}
                           title="Edit Item"
-                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all"
+                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all active:bg-primary/10"
                         >
                           <Edit2 size={20} />
-                        </button>
-                        <button 
+                        </motion.button>
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
                           onClick={() => handleDelete('publications', item.id)} 
                           title="Delete Item"
-                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all"
+                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all active:bg-red-100"
                         >
                           <Trash2 size={20} />
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
                   ))}
@@ -473,23 +492,25 @@ export default function AdminPage() {
                         <div className="text-sm text-primary font-bold">{item.value}</div>
                       </div>
                       <div className="flex gap-2">
-                        <button 
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
                           onClick={() => {
                             setEditingItem(item);
                             setShowAddModal(true);
                           }}
                           title="Edit Item"
-                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all"
+                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all active:bg-primary/10"
                         >
                           <Edit2 size={20} />
-                        </button>
-                        <button 
+                        </motion.button>
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
                           onClick={() => handleDelete('stats', item.id)} 
                           title="Delete Item"
-                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all"
+                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all active:bg-red-100"
                         >
                           <Trash2 size={20} />
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
                   ))}
@@ -505,23 +526,25 @@ export default function AdminPage() {
                         <div className="font-bold text-slate-900">{item.label}</div>
                       </div>
                       <div className="flex gap-2">
-                        <button 
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
                           onClick={() => {
                             setEditingItem(item);
                             setShowAddModal(true);
                           }}
                           title="Edit Item"
-                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all"
+                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all active:bg-primary/10"
                         >
                           <Edit2 size={20} />
-                        </button>
-                        <button 
+                        </motion.button>
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
                           onClick={() => handleDelete('specializations', item.id)} 
                           title="Delete Item"
-                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all"
+                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all active:bg-red-100"
                         >
                           <Trash2 size={20} />
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
                   ))}
@@ -538,23 +561,25 @@ export default function AdminPage() {
                         <div className="text-sm text-slate-500">{item.organization}</div>
                       </div>
                       <div className="flex gap-2">
-                        <button 
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
                           onClick={() => {
                             setEditingItem(item);
                             setShowAddModal(true);
                           }}
                           title="Edit Item"
-                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all"
+                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all active:bg-primary/10"
                         >
                           <Edit2 size={20} />
-                        </button>
-                        <button 
+                        </motion.button>
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
                           onClick={() => handleDelete('journey', item.id)} 
                           title="Delete Item"
-                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all"
+                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all active:bg-red-100"
                         >
                           <Trash2 size={20} />
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
                   ))}
@@ -623,7 +648,19 @@ export default function AdminPage() {
                         <label className="text-sm font-bold text-slate-700">Hero Background Color</label>
                         <div className="flex gap-4 items-center">
                           <input name="hero_bg_color" type="color" defaultValue={professor.hero_bg_color || "#0f172a"} className="w-20 h-12 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary p-1" />
-                          <span className="text-xs text-slate-400">Used if image is missing or as overlay base</span>
+                          <span className="text-xs text-slate-400">Base color</span>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-slate-700">Gradient Start</label>
+                        <div className="flex gap-4 items-center">
+                          <input name="hero_gradient_start" type="color" defaultValue={professor.hero_gradient_start || "#0f172a"} className="w-20 h-12 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary p-1" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-slate-700">Gradient End</label>
+                        <div className="flex gap-4 items-center">
+                          <input name="hero_gradient_end" type="text" defaultValue={professor.hero_gradient_end || "transparent"} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary transition-all" placeholder="e.g. #000000 or transparent" />
                         </div>
                       </div>
                       <div className="space-y-2">
@@ -664,9 +701,12 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <button type="submit" className="px-8 py-4 bg-primary text-white font-bold rounded-xl flex items-center gap-2 hover:bg-primary/90 transition-all">
+                  <motion.button 
+                    whileTap={{ scale: 0.95 }}
+                    type="submit" className="px-8 py-4 bg-primary text-white font-bold rounded-xl flex items-center gap-2 hover:bg-primary/90 transition-all active:bg-primary/80 shadow-lg shadow-primary/20"
+                  >
                     <Save size={20} /> Save All Settings
-                  </button>
+                  </motion.button>
                 </form>
               )}
 

@@ -73,6 +73,8 @@ db.exec(`
     hero_title TEXT,
     hero_subtitle TEXT,
     hero_bg_color TEXT,
+    hero_gradient_start TEXT,
+    hero_gradient_end TEXT,
     secondary_bg_color TEXT,
     address TEXT,
     phone TEXT
@@ -107,7 +109,7 @@ db.exec(`
 `);
 
 // Ensure new columns exist if table was created before
-const profColumns = ['logo_url', 'hero_image_url', 'hero_title', 'hero_subtitle', 'hero_bg_color', 'secondary_bg_color', 'address', 'phone'];
+const profColumns = ['logo_url', 'hero_image_url', 'hero_title', 'hero_subtitle', 'hero_bg_color', 'hero_gradient_start', 'hero_gradient_end', 'secondary_bg_color', 'address', 'phone'];
 for (const col of profColumns) {
   try {
     db.prepare(`ALTER TABLE professor ADD COLUMN ${col} TEXT`).run();
@@ -115,7 +117,7 @@ for (const col of profColumns) {
 }
 
 // Seed initial data
-db.prepare("INSERT OR REPLACE INTO professor (id, name, bio, photo_url, linkedin_url, email, logo_url, hero_image_url, hero_title, hero_subtitle, hero_bg_color, secondary_bg_color, address, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").run(
+db.prepare("INSERT OR REPLACE INTO professor (id, name, bio, photo_url, linkedin_url, email, logo_url, hero_image_url, hero_title, hero_subtitle, hero_bg_color, hero_gradient_start, hero_gradient_end, secondary_bg_color, address, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").run(
   1,
   "Dr. Muhammad Saiful Islam Khan",
   "Dr. Muhammad Saiful Islam Khan is a distinguished researcher in Environmental Health and Analytical Chemistry. His work focuses on single-particle mineralogy, microplasma-induced degradation of pesticides, and advanced microbial detection techniques. With a strong background in environmental science and pollution research, he leads the E&H Research Group in developing innovative solutions for water treatment and atmospheric monitoring.",
@@ -127,6 +129,8 @@ db.prepare("INSERT OR REPLACE INTO professor (id, name, bio, photo_url, linkedin
   "E&H Environmental Health Research Group", // hero_title
   "Investigating the complex interactions between environmental factors and human health to build a sustainable future.", // hero_subtitle
   "#0f172a", // hero_bg_color (slate-900)
+  "#0f172a", // hero_gradient_start
+  "transparent", // hero_gradient_end
   "#f8fafc", // secondary_bg_color (slate-50)
   "123 University Ave, Science Building, Room 405", // address
   "+1 (555) 000-0000" // phone
@@ -261,9 +265,9 @@ async function startServer() {
   });
 
   app.post("/api/professor", (req, res) => {
-    const { name, bio, photo_url, linkedin_url, email, logo_url, hero_image_url, hero_title, hero_subtitle, hero_bg_color, secondary_bg_color, address, phone } = req.body;
-    db.prepare("UPDATE professor SET name = ?, bio = ?, photo_url = ?, linkedin_url = ?, email = ?, logo_url = ?, hero_image_url = ?, hero_title = ?, hero_subtitle = ?, hero_bg_color = ?, secondary_bg_color = ?, address = ?, phone = ? WHERE id = 1")
-      .run(name, bio, photo_url, linkedin_url, email, logo_url, hero_image_url, hero_title, hero_subtitle, hero_bg_color, secondary_bg_color, address, phone);
+    const { name, bio, photo_url, linkedin_url, email, logo_url, hero_image_url, hero_title, hero_subtitle, hero_bg_color, hero_gradient_start, hero_gradient_end, secondary_bg_color, address, phone } = req.body;
+    db.prepare("UPDATE professor SET name = ?, bio = ?, photo_url = ?, linkedin_url = ?, email = ?, logo_url = ?, hero_image_url = ?, hero_title = ?, hero_subtitle = ?, hero_bg_color = ?, hero_gradient_start = ?, hero_gradient_end = ?, secondary_bg_color = ?, address = ?, phone = ? WHERE id = 1")
+      .run(name, bio, photo_url, linkedin_url, email, logo_url, hero_image_url, hero_title, hero_subtitle, hero_bg_color, hero_gradient_start, hero_gradient_end, secondary_bg_color, address, phone);
     res.json({ success: true });
   });
 
