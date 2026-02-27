@@ -48,6 +48,33 @@ export interface Professor {
   phone?: string;
 }
 
+export interface TeamMember {
+  id: number;
+  name: string;
+  role: string;
+  bio: string;
+  photo_url: string;
+  order_index: number;
+}
+
+export interface Instrument {
+  id: number;
+  name: string;
+  description: string;
+  image_url: string;
+  specifications: string;
+}
+
+export interface Conference {
+  id: number;
+  title: string;
+  date: string;
+  location: string;
+  description: string;
+  link?: string;
+  image_url?: string;
+}
+
 export interface Specialization {
   id: number;
   cluster: string;

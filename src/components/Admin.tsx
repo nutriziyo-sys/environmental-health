@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Trash2, Save, LogOut, LayoutDashboard, Newspaper, Microscope, BookOpen, BarChart3, MessageSquare, UserCircle, X, Target, Award, Edit2 } from 'lucide-react';
-import { NewsItem, ResearchArea, Publication, Stat, Message, Professor, Specialization, AcademicJourney } from '../types';
+import { Plus, Trash2, Save, LogOut, LayoutDashboard, Newspaper, Microscope, BookOpen, BarChart3, MessageSquare, UserCircle, X, Target, Award, Edit2, Upload, Users, Wrench, Calendar } from 'lucide-react';
+import { NewsItem, ResearchArea, Publication, Stat, Message, Professor, Specialization, AcademicJourney, TeamMember, Instrument, Conference } from '../types';
 import { cn, formatDate } from '../lib/utils';
 
-type Tab = 'dashboard' | 'news' | 'research' | 'specializations' | 'publications' | 'stats' | 'journey' | 'messages' | 'professor';
+type Tab = 'dashboard' | 'news' | 'research' | 'specializations' | 'publications' | 'stats' | 'journey' | 'messages' | 'professor' | 'team' | 'instruments' | 'conferences';
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
@@ -15,6 +15,9 @@ export default function AdminPage() {
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
   const [journey, setJourney] = useState<AcademicJourney[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [team, setTeam] = useState<TeamMember[]>([]);
+  const [instruments, setInstruments] = useState<Instrument[]>([]);
+  const [conferences, setConferences] = useState<Conference[]>([]);
   const [professor, setProfessor] = useState<Professor | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
@@ -23,7 +26,7 @@ export default function AdminPage() {
   const [editingItem, setEditingItem] = useState<any>(null);
 
   const fetchData = async () => {
-    const [n, r, p, s, spec, j, m, prof] = await Promise.all([
+    const [n, r, p, s, spec, j, m, prof, t, inst, conf] = await Promise.all([
       fetch('/api/news').then(res => res.json()),
       fetch('/api/research').then(res => res.json()),
       fetch('/api/publications').then(res => res.json()),
@@ -32,6 +35,9 @@ export default function AdminPage() {
       fetch('/api/academic_journey').then(res => res.json()),
       fetch('/api/messages').then(res => res.json()),
       fetch('/api/professor').then(res => res.json()),
+      fetch('/api/team').then(res => res.json()),
+      fetch('/api/instruments').then(res => res.json()),
+      fetch('/api/conferences').then(res => res.json()),
     ]);
     setNews(n);
     setResearch(r);
@@ -41,6 +47,65 @@ export default function AdminPage() {
     setJourney(j);
     setMessages(m);
     setProfessor(prof);
+    setTeam(t);
+    setInstruments(inst);
+    setConferences(conf);
+  };
+
+  const handleFileUpload = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    if (!res.ok) throw new Error('Upload failed');
+    const data = await res.json();
+    return data.url;
+  };
+
+  const FileUploadButton = ({ name, label, currentUrl }: { name: string, label: string, currentUrl?: string }) => {
+    const [fileName, setFileName] = useState<string>('');
+    const [preview, setPreview] = useState<string>(currentUrl || '');
+
+    return (
+      <div className="space-y-2">
+        <label className="text-sm font-bold text-slate-700">{label}</label>
+        <div className="flex items-center gap-4">
+          <label className="flex-grow">
+            <div className={cn(
+              "flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-slate-200 hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group",
+              fileName && "border-primary bg-primary/5"
+            )}>
+              <Upload size={18} className="text-slate-400 group-hover:text-primary" />
+              <span className="text-sm font-medium text-slate-500 group-hover:text-primary">
+                {fileName || 'Click to upload photo'}
+              </span>
+              <input 
+                type="file" 
+                name={name} 
+                className="hidden" 
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setFileName(file.name);
+                    const reader = new FileReader();
+                    reader.onloadend = () => setPreview(reader.result as string);
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
+            </div>
+          </label>
+          {preview && (
+            <div className="w-12 h-12 rounded-lg overflow-hidden border border-slate-200 shrink-0">
+              <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   useEffect(() => {
@@ -116,10 +181,21 @@ export default function AdminPage() {
 
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
     
     try {
+      // Handle file uploads
+      const fileInputs = form.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>;
+      for (const input of fileInputs) {
+        if (input.files && input.files[0]) {
+          const fieldName = input.name.replace('_file', '');
+          const url = await handleFileUpload(input.files[0]);
+          data[fieldName] = url;
+        }
+      }
+
       let endpoint = '';
       if (activeTab === 'news') endpoint = '/api/news';
       if (activeTab === 'publications') endpoint = '/api/publications';
@@ -127,6 +203,9 @@ export default function AdminPage() {
       if (activeTab === 'stats') endpoint = '/api/stats';
       if (activeTab === 'specializations') endpoint = '/api/specializations';
       if (activeTab === 'journey') endpoint = '/api/academic_journey';
+      if (activeTab === 'team') endpoint = '/api/team';
+      if (activeTab === 'instruments') endpoint = '/api/instruments';
+      if (activeTab === 'conferences') endpoint = '/api/conferences';
 
       const method = editingItem ? 'PUT' : 'POST';
       const url = editingItem ? `${endpoint}/${editingItem.id}` : endpoint;
@@ -153,9 +232,12 @@ export default function AdminPage() {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'news', label: 'News', icon: Newspaper },
+    { id: 'team', label: 'Team', icon: Users },
     { id: 'research', label: 'Research Projects', icon: Microscope },
-    { id: 'specializations', label: 'Specializations', icon: Target },
+    { id: 'instruments', label: 'Instruments', icon: Wrench },
+    { id: 'conferences', label: 'Conferences', icon: Calendar },
     { id: 'publications', label: 'Publications', icon: BookOpen },
+    { id: 'specializations', label: 'Specializations', icon: Target },
     { id: 'stats', label: 'Statistics', icon: BarChart3 },
     { id: 'journey', label: 'Academic Journey', icon: Award },
     { id: 'professor', label: 'Site Settings', icon: UserCircle },
@@ -245,7 +327,13 @@ export default function AdminPage() {
                       <input name="title" defaultValue={editingItem?.title} placeholder="News Title" required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
                       <input name="date" type="date" defaultValue={editingItem?.date?.split('T')[0]} required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
                     </div>
-                    <input name="image_url" defaultValue={editingItem?.image_url} placeholder="Image URL" className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                    <div className="grid grid-cols-1 gap-4">
+                      <FileUploadButton name="image_url_file" label="News Image" currentUrl={editingItem?.image_url} />
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500">Or provide Image URL</label>
+                        <input name="image_url" defaultValue={editingItem?.image_url} placeholder="https://..." className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                      </div>
+                    </div>
                     <textarea name="content" defaultValue={editingItem?.content} placeholder="News Content" rows={4} required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary resize-none"></textarea>
                   </>
                 )}
@@ -260,25 +348,40 @@ export default function AdminPage() {
                       <input name="year" type="number" defaultValue={editingItem?.year} placeholder="Year" required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
                       <input name="impact_factor" defaultValue={editingItem?.impact_factor} placeholder="Impact Factor (e.g. 5.8)" className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4">
                       <input name="link" defaultValue={editingItem?.link} placeholder="Article Link" className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
-                      <input name="journal_image_url" defaultValue={editingItem?.journal_image_url} placeholder="Journal Image URL" className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                    </div>
+                    <div className="grid grid-cols-1 gap-4">
+                      <FileUploadButton name="journal_image_url_file" label="Journal Image" currentUrl={editingItem?.journal_image_url} />
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500">Or provide Journal Image URL</label>
+                        <input name="journal_image_url" defaultValue={editingItem?.journal_image_url} placeholder="https://..." className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                      </div>
                     </div>
                   </>
                 )}
                 {activeTab === 'research' && (
                   <>
                     <input name="title" defaultValue={editingItem?.title} placeholder="Research Area Title" required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                    <div className="grid grid-cols-1 gap-4">
+                      <FileUploadButton name="image_url_file" label="Research Image" currentUrl={editingItem?.image_url} />
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500">Or provide Image URL</label>
+                        <input name="image_url" defaultValue={editingItem?.image_url} placeholder="https://..." className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                      </div>
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
-                      <input name="image_url" defaultValue={editingItem?.image_url} placeholder="Image URL" className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
-                      <select name="icon_name" defaultValue={editingItem?.icon_name || 'Microscope'} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary">
-                        <option value="Microscope">Microscope</option>
-                        <option value="Zap">Zap</option>
-                        <option value="ShieldCheck">ShieldCheck</option>
-                        <option value="Beaker">Beaker</option>
-                        <option value="Target">Target</option>
-                        <option value="Award">Award</option>
-                      </select>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500">Icon Selection</label>
+                        <select name="icon_name" defaultValue={editingItem?.icon_name || 'Microscope'} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary">
+                          <option value="Microscope">Microscope</option>
+                          <option value="Zap">Zap</option>
+                          <option value="ShieldCheck">ShieldCheck</option>
+                          <option value="Beaker">Beaker</option>
+                          <option value="Target">Target</option>
+                          <option value="Award">Award</option>
+                        </select>
+                      </div>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                       <div className="space-y-1">
@@ -327,6 +430,55 @@ export default function AdminPage() {
                       <input name="title" defaultValue={editingItem?.title} placeholder="Title (e.g. Full Professor)" required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
                       <input name="organization" defaultValue={editingItem?.organization} placeholder="Organization" required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
                     </div>
+                  </div>
+                )}
+                {activeTab === 'team' && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <input name="name" defaultValue={editingItem?.name} placeholder="Name" required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                      <input name="role" defaultValue={editingItem?.role} placeholder="Role (e.g. PhD Student)" required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                    </div>
+                    <div className="grid grid-cols-1 gap-4">
+                      <FileUploadButton name="photo_url_file" label="Member Photo" currentUrl={editingItem?.photo_url} />
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500">Or provide Photo URL</label>
+                        <input name="photo_url" defaultValue={editingItem?.photo_url} placeholder="https://..." className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                      </div>
+                    </div>
+                    <input name="order_index" type="number" defaultValue={editingItem?.order_index || 0} placeholder="Order Index" className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                    <textarea name="bio" defaultValue={editingItem?.bio} placeholder="Short Bio" rows={3} required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary resize-none"></textarea>
+                  </div>
+                )}
+                {activeTab === 'instruments' && (
+                  <div className="space-y-4">
+                    <input name="name" defaultValue={editingItem?.name} placeholder="Instrument Name" required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                    <div className="grid grid-cols-1 gap-4">
+                      <FileUploadButton name="image_url_file" label="Instrument Image" currentUrl={editingItem?.image_url} />
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500">Or provide Image URL</label>
+                        <input name="image_url" defaultValue={editingItem?.image_url} placeholder="https://..." className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                      </div>
+                    </div>
+                    <textarea name="description" defaultValue={editingItem?.description} placeholder="Description" rows={3} required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary resize-none"></textarea>
+                    <textarea name="specifications" defaultValue={editingItem?.specifications} placeholder="Specifications (one per line)" rows={4} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary resize-none"></textarea>
+                  </div>
+                )}
+                {activeTab === 'conferences' && (
+                  <div className="space-y-4">
+                    <input name="title" defaultValue={editingItem?.title} placeholder="Conference Title" required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                    <div className="grid grid-cols-2 gap-4">
+                      <input name="date" defaultValue={editingItem?.date} placeholder="Date (e.g. Oct 2023)" required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                      <input name="location" defaultValue={editingItem?.location} placeholder="Location" required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                    </div>
+                    <div className="grid grid-cols-1 gap-4">
+                      <FileUploadButton name="image_url_file" label="Conference Image" currentUrl={editingItem?.image_url} />
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-500">Or provide Image URL</label>
+                        <input name="image_url" defaultValue={editingItem?.image_url} placeholder="https://..." className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                      </div>
+                    </div>
+                    <input name="link" defaultValue={editingItem?.link} placeholder="Conference Link" className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary" />
+                    <textarea name="description" defaultValue={editingItem?.description} placeholder="Description" rows={3} required className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary resize-none"></textarea>
                   </div>
                 )}
                 <div className="flex gap-4">
@@ -401,6 +553,117 @@ export default function AdminPage() {
                         <motion.button 
                           whileTap={{ scale: 0.9 }}
                           onClick={() => handleDelete('news', item.id)} 
+                          title="Delete Item"
+                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all active:bg-red-100"
+                        >
+                          <Trash2 size={20} />
+                        </motion.button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'team' && (
+                <div className="space-y-4">
+                  {team.map(item => (
+                    <div key={item.id} className="p-6 bg-white rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center">
+                      <div className="flex gap-4 items-center">
+                        <img src={item.photo_url} className="w-16 h-16 rounded-lg object-cover" alt="" />
+                        <div>
+                          <div className="font-bold text-slate-900">{item.name}</div>
+                          <div className="text-sm text-slate-500">{item.role}</div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => {
+                            setEditingItem(item);
+                            setShowAddModal(true);
+                          }}
+                          title="Edit Item"
+                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all active:bg-primary/10"
+                        >
+                          <Edit2 size={20} />
+                        </motion.button>
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handleDelete('team', item.id)} 
+                          title="Delete Item"
+                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all active:bg-red-100"
+                        >
+                          <Trash2 size={20} />
+                        </motion.button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'instruments' && (
+                <div className="space-y-4">
+                  {instruments.map(item => (
+                    <div key={item.id} className="p-6 bg-white rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center">
+                      <div className="flex gap-4 items-center">
+                        <img src={item.image_url} className="w-16 h-16 rounded-lg object-cover" alt="" />
+                        <div>
+                          <div className="font-bold text-slate-900">{item.name}</div>
+                          <div className="text-sm text-slate-500 truncate max-w-md">{item.description}</div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => {
+                            setEditingItem(item);
+                            setShowAddModal(true);
+                          }}
+                          title="Edit Item"
+                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all active:bg-primary/10"
+                        >
+                          <Edit2 size={20} />
+                        </motion.button>
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handleDelete('instruments', item.id)} 
+                          title="Delete Item"
+                          className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all active:bg-red-100"
+                        >
+                          <Trash2 size={20} />
+                        </motion.button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'conferences' && (
+                <div className="space-y-4">
+                  {conferences.map(item => (
+                    <div key={item.id} className="p-6 bg-white rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center">
+                      <div className="flex gap-4 items-center">
+                        <img src={item.image_url} className="w-16 h-16 rounded-lg object-cover" alt="" />
+                        <div>
+                          <div className="font-bold text-slate-900">{item.title}</div>
+                          <div className="text-sm text-slate-500">{item.date} - {item.location}</div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => {
+                            setEditingItem(item);
+                            setShowAddModal(true);
+                          }}
+                          title="Edit Item"
+                          className="p-3 text-slate-400 hover:bg-slate-100 hover:text-primary rounded-xl transition-all active:bg-primary/10"
+                        >
+                          <Edit2 size={20} />
+                        </motion.button>
+                        <motion.button 
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handleDelete('conferences', item.id)} 
                           title="Delete Item"
                           className="p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all active:bg-red-100"
                         >
@@ -591,9 +854,20 @@ export default function AdminPage() {
                   className="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 space-y-8"
                   onSubmit={async (e) => {
                     e.preventDefault();
-                    const formData = new FormData(e.currentTarget);
+                    const form = e.currentTarget;
+                    const formData = new FormData(form);
                     const data = Object.fromEntries(formData.entries());
                     try {
+                      // Handle file uploads
+                      const fileInputs = form.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>;
+                      for (const input of fileInputs) {
+                        if (input.files && input.files[0]) {
+                          const fieldName = input.name.replace('_file', '');
+                          const url = await handleFileUpload(input.files[0]);
+                          data[fieldName] = url;
+                        }
+                      }
+
                       const res = await fetch('/api/professor', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -601,6 +875,7 @@ export default function AdminPage() {
                       });
                       if (res.ok) {
                         alert('Site settings updated!');
+                        window.dispatchEvent(new CustomEvent('settingsUpdated'));
                         fetchData();
                       } else {
                         alert('Failed to update settings');
@@ -626,9 +901,12 @@ export default function AdminPage() {
                         <label className="text-sm font-bold text-slate-700">LinkedIn URL</label>
                         <input name="linkedin_url" defaultValue={professor.linkedin_url} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary transition-all" />
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-700">Logo URL</label>
-                        <input name="logo_url" defaultValue={professor.logo_url} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary transition-all" placeholder="Leave empty for default icon" />
+                      <div className="space-y-4">
+                        <FileUploadButton name="logo_url_file" label="Site Logo" currentUrl={professor.logo_url} />
+                        <div className="space-y-2">
+                          <label className="text-sm font-bold text-slate-700">Or provide Logo URL</label>
+                          <input name="logo_url" defaultValue={professor.logo_url} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary transition-all" placeholder="Leave empty for default icon" />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -640,9 +918,12 @@ export default function AdminPage() {
                         <label className="text-sm font-bold text-slate-700">Hero Title</label>
                         <input name="hero_title" defaultValue={professor.hero_title} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary transition-all" />
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-700">Hero Image URL</label>
-                        <input name="hero_image_url" defaultValue={professor.hero_image_url} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary transition-all" />
+                      <div className="space-y-4">
+                        <FileUploadButton name="hero_image_url_file" label="Hero Background Image" currentUrl={professor.hero_image_url} />
+                        <div className="space-y-2">
+                          <label className="text-sm font-bold text-slate-700">Or provide Hero Image URL</label>
+                          <input name="hero_image_url" defaultValue={professor.hero_image_url} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary transition-all" />
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-slate-700">Hero Background Color</label>
@@ -680,9 +961,12 @@ export default function AdminPage() {
                   <div className="space-y-6">
                     <h3 className="text-xl font-serif font-bold border-b pb-2">Biography & Photo</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-700">Professor Photo URL</label>
-                        <input name="photo_url" defaultValue={professor.photo_url} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary transition-all" />
+                      <div className="space-y-4">
+                        <FileUploadButton name="photo_url_file" label="Professor Photo" currentUrl={professor.photo_url} />
+                        <div className="space-y-2">
+                          <label className="text-sm font-bold text-slate-700">Or provide Photo URL</label>
+                          <input name="photo_url" defaultValue={professor.photo_url} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary transition-all" />
+                        </div>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
