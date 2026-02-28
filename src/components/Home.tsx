@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, Users, BookOpen, Microscope, Send, ChevronRight, ChevronLeft, Mail, MapPin, Zap, ShieldCheck, Beaker, Target, Award } from 'lucide-react';
+import { ArrowRight, Users, BookOpen, Microscope, Send, ChevronRight, ChevronLeft, Mail, MapPin, Zap, ShieldCheck, Beaker, Target, Award, Leaf } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { NewsItem, Stat, ResearchArea, Professor } from '../types';
 import { formatDate } from '../lib/utils';
@@ -74,7 +74,7 @@ export default function Home() {
               transition={{ delay: 0.3 }}
               className="inline-block px-6 py-2 bg-[#1e3a8a] text-white text-sm font-bold uppercase tracking-widest rounded-lg mb-8 shadow-xl border border-white/10"
             >
-              Advancing Environmental Health
+              {settings?.hero_badge || 'Advancing Environmental Health'}
             </motion.div>
             <h1 className="text-6xl md:text-8xl lg:text-9xl font-serif font-bold text-white mb-10 leading-[0.85] tracking-tighter">
               {settings?.hero_title ? (
@@ -114,9 +114,11 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6">Research Landscape</h2>
-            <div className="w-24 h-1 bg-primary mx-auto mb-8"></div>
-            <p className="text-slate-600 max-w-2xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6">
+              Research <span className="text-primary">Landscape</span>
+            </h2>
+            <div className="w-24 h-1.5 bg-primary mx-auto mb-8 rounded-full"></div>
+            <p className="text-slate-600 max-w-2xl mx-auto text-lg">
               Our work spans across multiple critical domains of environmental health, 
               integrated through advanced data science and field monitoring.
             </p>
@@ -160,10 +162,13 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
             <div>
               <span className="text-primary font-bold uppercase tracking-widest text-xs mb-4 block">Latest Updates</span>
-              <h2 className="text-4xl md:text-5xl font-serif font-bold">Group News</h2>
+              <h2 className="text-4xl md:text-5xl font-serif font-bold">
+                Group <span className="text-primary">News</span>
+              </h2>
+              <div className="w-20 h-1.5 bg-primary mt-4 rounded-full"></div>
             </div>
             {archivedNewsCount > 0 && (
-              <Link to="/news-archive" className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-full text-sm font-bold transition-colors">
+              <Link to="/news-archive" className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-full text-sm font-bold transition-colors border border-white/10">
                 View Archive ({archivedNewsCount} more)
               </Link>
             )}
@@ -243,10 +248,22 @@ export default function Home() {
         style={{ backgroundColor: settings?.secondary_bg_color || '#ffffff' }}
       >
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
             <div>
-              <h2 className="text-4xl font-serif font-bold mb-6">Get in Touch</h2>
-              <p className="text-slate-600 mb-8 leading-relaxed">
+              <div className="mb-10">
+                <div className="w-24 h-24 bg-primary rounded-full flex items-center justify-center text-white shadow-2xl overflow-hidden border-4 border-white">
+                  {settings?.logo_url ? (
+                    <img src={settings.logo_url} alt="Logo" className="w-full h-full object-cover" />
+                  ) : (
+                    <Leaf size={48} />
+                  )}
+                </div>
+              </div>
+              <h2 className="text-4xl font-serif font-bold mb-6">
+                Get in <span className="text-primary">Touch</span>
+              </h2>
+              <div className="w-16 h-1.5 bg-primary mb-8 rounded-full"></div>
+              <p className="text-slate-600 mb-8 leading-relaxed text-lg">
                 Interested in collaboration, joining the group, or learning more about our research? 
                 Send us a message and we'll get back to you as soon as possible.
               </p>

@@ -40,6 +40,7 @@ export interface Professor {
   hero_image_url?: string;
   hero_title?: string;
   hero_subtitle?: string;
+  hero_badge?: string;
   hero_bg_color?: string;
   hero_gradient_start?: string;
   hero_gradient_end?: string;

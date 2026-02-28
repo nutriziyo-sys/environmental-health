@@ -34,8 +34,10 @@ export default function ProfessorPage() {
 
           <div className="flex-grow space-y-8">
             <div>
-              <h1 className="text-5xl md:text-6xl font-serif font-bold mb-4">{professor.name}</h1>
-              <p className="text-primary font-bold text-2xl mb-6">Principal Investigator</p>
+              <h1 className="text-5xl md:text-6xl font-serif font-bold mb-4">
+                {professor.name.split(' ').slice(0, -1).join(' ')} <span className="text-primary">{professor.name.split(' ').slice(-1)}</span>
+              </h1>
+              <p className="text-slate-500 font-bold text-2xl mb-6 tracking-tight">Principal Investigator</p>
               
               <div className="flex gap-4 mb-8">
                 {professor.linkedin_url && (
@@ -88,12 +90,18 @@ export default function ProfessorPage() {
               animate={{ opacity: 1, y: 0 }}
               className="prose prose-slate prose-lg max-w-none"
             >
-              <h2 className="text-3xl font-serif font-bold mb-8">Background & Vision</h2>
-              <div className="whitespace-pre-wrap text-slate-600 leading-relaxed">
+              <h2 className="text-3xl font-serif font-bold mb-4">
+                Background & <span className="text-primary">Vision</span>
+              </h2>
+              <div className="w-16 h-1 bg-primary mb-8 rounded-full"></div>
+              <div className="whitespace-pre-wrap text-slate-600 leading-relaxed text-lg">
                 {professor.bio}
               </div>
 
-              <h3 className="text-2xl font-serif font-bold mt-12 mb-6">Academic Journey</h3>
+              <h3 className="text-2xl font-serif font-bold mt-16 mb-4">
+                Academic <span className="text-primary">Journey</span>
+              </h3>
+              <div className="w-12 h-1 bg-primary mb-8 rounded-full"></div>
               <div className="space-y-8 mt-8">
                 {journey.map((item, idx) => (
                   <div key={item.id} className="flex gap-6 relative">

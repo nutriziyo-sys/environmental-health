@@ -240,7 +240,7 @@ export default function AdminPage() {
     { id: 'specializations', label: 'Specializations', icon: Target },
     { id: 'stats', label: 'Statistics', icon: BarChart3 },
     { id: 'journey', label: 'Academic Journey', icon: Award },
-    { id: 'professor', label: 'Site Settings', icon: UserCircle },
+    { id: 'professor', label: 'Home & Site Settings', icon: UserCircle },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
   ];
 
@@ -917,6 +917,10 @@ export default function AdminPage() {
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-slate-700">Hero Title</label>
                         <input name="hero_title" defaultValue={professor.hero_title} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary transition-all" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-slate-700">Hero Badge Text</label>
+                        <input name="hero_badge" defaultValue={professor.hero_badge || "Advancing Environmental Health"} className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-primary transition-all" />
                       </div>
                       <div className="space-y-4">
                         <FileUploadButton name="hero_image_url_file" label="Hero Background Image" currentUrl={professor.hero_image_url} />

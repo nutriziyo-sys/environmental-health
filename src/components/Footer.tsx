@@ -13,11 +13,17 @@ export default function Footer() {
     <footer className="bg-slate-900 text-slate-300 py-16 px-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="col-span-1 md:col-span-2">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white">
-              <Leaf size={18} />
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white shadow-lg overflow-hidden border-2 border-slate-800">
+              {settings?.logo_url ? (
+                <img src={settings.logo_url} alt="Logo" className="w-full h-full object-cover" />
+              ) : (
+                <Leaf size={32} />
+              )}
             </div>
-            <span className="font-serif font-bold text-2xl text-white">E&H Research</span>
+            <span className="font-serif font-bold text-2xl text-white">
+              {settings?.hero_title?.split(' ')[0] || 'E&H'} <span className="text-primary">Research</span>
+            </span>
           </div>
           <p className="max-w-md text-slate-400 leading-relaxed mb-8">
             Dedicated to advancing environmental health through rigorous research, 

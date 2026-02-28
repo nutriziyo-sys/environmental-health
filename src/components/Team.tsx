@@ -29,8 +29,9 @@ export default function TeamPage() {
             transition={{ delay: 0.1 }}
             className="text-5xl md:text-6xl font-serif font-bold mb-6"
           >
-            Meet the Researchers
+            Meet the <span className="text-primary italic">Researchers</span>
           </motion.h1>
+          <div className="w-24 h-1.5 bg-primary mx-auto mb-8 rounded-full"></div>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

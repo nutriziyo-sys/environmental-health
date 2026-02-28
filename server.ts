@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Ensure uploads directory exists
-const uploadsDir = path.join(process.cwd(), "public", "uploads");
+const uploadsDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
@@ -92,6 +92,7 @@ db.exec(`
     hero_image_url TEXT,
     hero_title TEXT,
     hero_subtitle TEXT,
+    hero_badge TEXT,
     hero_bg_color TEXT,
     hero_gradient_start TEXT,
     hero_gradient_end TEXT,
@@ -99,7 +100,14 @@ db.exec(`
     address TEXT,
     phone TEXT
   );
+`);
 
+// Ensure hero_badge column exists if table was created before
+try {
+  db.prepare("ALTER TABLE professor ADD COLUMN hero_badge TEXT").run();
+} catch (e) {}
+
+db.exec(`
   CREATE TABLE IF NOT EXISTS specializations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     cluster TEXT NOT NULL,
@@ -327,10 +335,10 @@ async function startServer() {
   });
 
   app.post("/api/professor", (req, res) => {
-    const { name, bio, photo_url, linkedin_url, email, logo_url, hero_image_url, hero_title, hero_subtitle, hero_bg_color, hero_gradient_start, hero_gradient_end, secondary_bg_color, address, phone } = req.body;
+    const { name, bio, photo_url, linkedin_url, email, logo_url, hero_image_url, hero_title, hero_subtitle, hero_badge, hero_bg_color, hero_gradient_start, hero_gradient_end, secondary_bg_color, address, phone } = req.body;
     console.log('Updating professor settings, logo_url:', logo_url);
-    db.prepare("UPDATE professor SET name = ?, bio = ?, photo_url = ?, linkedin_url = ?, email = ?, logo_url = ?, hero_image_url = ?, hero_title = ?, hero_subtitle = ?, hero_bg_color = ?, hero_gradient_start = ?, hero_gradient_end = ?, secondary_bg_color = ?, address = ?, phone = ? WHERE id = 1")
-      .run(name, bio, photo_url, linkedin_url, email, logo_url, hero_image_url, hero_title, hero_subtitle, hero_bg_color, hero_gradient_start, hero_gradient_end, secondary_bg_color, address, phone);
+    db.prepare("UPDATE professor SET name = ?, bio = ?, photo_url = ?, linkedin_url = ?, email = ?, logo_url = ?, hero_image_url = ?, hero_title = ?, hero_subtitle = ?, hero_badge = ?, hero_bg_color = ?, hero_gradient_start = ?, hero_gradient_end = ?, secondary_bg_color = ?, address = ?, phone = ? WHERE id = 1")
+      .run(name, bio, photo_url, linkedin_url, email, logo_url, hero_image_url, hero_title, hero_subtitle, hero_badge, hero_bg_color, hero_gradient_start, hero_gradient_end, secondary_bg_color, address, phone);
     res.json({ success: true });
   });
 

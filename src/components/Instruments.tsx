@@ -30,8 +30,9 @@ export default function InstrumentsPage() {
             transition={{ delay: 0.1 }}
             className="text-5xl md:text-6xl font-serif font-bold mb-6"
           >
-            Advanced Instrumentation
+            Advanced <span className="text-primary italic">Instrumentation</span>
           </motion.h1>
+          <div className="w-24 h-1.5 bg-primary mx-auto mb-8 rounded-full"></div>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
