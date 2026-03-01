@@ -96,7 +96,8 @@ export default function Navbar() {
           
           {/* Research Dropdown */}
           <div className="relative group/dropdown">
-            <button 
+            <Link 
+              to="/research"
               className={cn(
                 'flex items-center gap-1 px-4 py-2 rounded-full text-sm font-bold transition-all duration-300',
                 isResearchActive
@@ -105,7 +106,7 @@ export default function Navbar() {
               )}
             >
               Research <ChevronDown size={14} className={cn("transition-transform duration-300 group-hover/dropdown:rotate-180")} />
-            </button>
+            </Link>
             <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-100 py-3 opacity-0 invisible group-hover/dropdown:opacity-100 group-hover/dropdown:visible transition-all translate-y-2 group-hover/dropdown:translate-y-0 overflow-hidden">
               <div className="px-4 py-2 mb-1 border-b border-slate-50">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Our Work</span>
