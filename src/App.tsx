@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import Layout from './components/Layout';
 import Home from './components/Home';
 import ProfessorPage from './components/Professor';
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="news-archive" element={<NewsArchive />} />
         </Route>
       </Routes>
+      <SpeedInsights />
     </BrowserRouter>
   );
 }
